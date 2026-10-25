@@ -1,0 +1,18 @@
+-- Olist dataset import script for a NEW, EMPTY database.
+-- Run from the project root with psql (not the DBeaver SQL editor).
+-- Place the nine original Olist CSV files in the project's data/ folder.
+-- First execute sql/01_create_tables.sql to create the tables.
+-- Then run:
+-- psql -h localhost -U postgres -d olist_ecommerce -v ON_ERROR_STOP=1 -f sql/02_import_data.psql
+-- Do not run this against tables that already contain data: it may duplicate rows or fail.
+
+-- Parent tables first, followed by dependent tables.
+\copy customers FROM 'data/olist_customers_dataset.csv' WITH (FORMAT csv, HEADER true)
+\copy orders FROM 'data/olist_orders_dataset.csv' WITH (FORMAT csv, HEADER true)
+\copy sellers FROM 'data/olist_sellers_dataset.csv' WITH (FORMAT csv, HEADER true)
+\copy products FROM 'data/olist_products_dataset.csv' WITH (FORMAT csv, HEADER true)
+\copy order_items FROM 'data/olist_order_items_dataset.csv' WITH (FORMAT csv, HEADER true)
+\copy order_payments FROM 'data/olist_order_payments_dataset.csv' WITH (FORMAT csv, HEADER true)
+\copy order_reviews FROM 'data/olist_order_reviews_dataset.csv' WITH (FORMAT csv, HEADER true)
+\copy geolocation FROM 'data/olist_geolocation_dataset.csv' WITH (FORMAT csv, HEADER true)
+\copy product_category_name_translation FROM 'data/product_category_name_translation.csv' WITH (FORMAT csv, HEADER true)
