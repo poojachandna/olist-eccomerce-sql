@@ -1,47 +1,160 @@
-# Olist E-Commerce Analytics | PostgreSQL
+# Olist E-Commerce SQL Analytics
+
+A PostgreSQL-based analytics project that loads and analyzes the Brazilian Olist e-commerce dataset to answer business questions around revenue, customer behavior, product performance, geography, and delivery experience.
 
 ## Project overview
-SQL analysis of the public Brazilian Olist e-commerce dataset (~100k orders) to examine order trends, revenue, customer purchasing, product/seller performance, and delivery experience.
 
-**Tools:** PostgreSQL, DBeaver, GitHub.  
-**Dataset:** [Brazilian E-Commerce Public Dataset by Olist (Kaggle)](https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce)
+This repository contains SQL scripts to:
 
-## Business questions
-1. Which states generate the most orders?
-2. How does order volume change month to month?
-3. What are merchandise revenue and average order value?
-4. How common are repeat purchases?
-5. Which product categories and sellers generate the most sales?
-6. How do delivery delays relate to review scores?
+- create the database schema
+- import the public Olist CSV datasets into PostgreSQL
+- validate the data
+- run business-focused analyses
+- export results as CSV files for review and reporting
 
-## Findings (verified so far)
-- São Paulo generated **41,746 orders (41.98%)** in the geographic order analysis.
-- Orders per unique customer rounded to **1.04** in São Paulo versus **1.05** in RO and AC. These small differences do not establish meaningful differences in retention.
+The analysis is designed around the publicly available Brazilian E-Commerce Public Dataset by Olist, which includes customer, order, payment, product, seller, review, and geolocation data.
 
-**To complete:** Add actual outputs from scripts `05`–`09` only after running and validating them. Add 3–5 concise insights, limitations, and an ER diagram.
+## Why this project
+
+The goal is to turn raw Olist data into practical insights, such as:
+
+- which states generate the most orders and revenue
+- how order volume changes over time
+- which payment methods are most common
+- which product categories and sellers perform best
+- how repeat purchases vary by customer
+- whether delivery delays are associated with lower review scores
+
+## Dataset
+
+This project uses the Olist Brazilian E-Commerce dataset from Kaggle.
+
+- Source: https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce
+- Data files are not stored in the repository and should be downloaded locally before importing.
 
 ## Repository structure
-- `sql/01_create_tables.sql` — nine-table schema
-- `sql/02_import_data.psql` — psql CSV imports (customers/orders commented out for existing DB)
-- `sql/03_data_validation.sql` — row counts and checks
-- `sql/04_geographic_analysis.sql` — order distribution by state
-- `sql/05_monthly_trends.sql` — monthly order volumes and growth
-- `sql/06_revenue_analysis.sql` — merchandise revenue, AOV, payments
-- `sql/07_customer_analysis.sql` — repeat behaviour and customer value
-- `sql/08_product_seller_analysis.sql` — category, product and seller rankings
-- `sql/09_delivery_reviews_analysis.sql` — delivery speed and review scores
 
-## Reproduce
-1. Download the nine original Olist CSV files from Kaggle and place them in a local `data/` folder (not committed to Git).
-2. Create a PostgreSQL database named `olist_ecommerce`.
-3. Execute `sql/01_create_tables.sql` in DBeaver.
-4. From the repository root, run `psql -h localhost -U postgres -d olist_ecommerce -v ON_ERROR_STOP=1 -f sql/02_import_data.psql`. **For a fresh database, uncomment the two customers/orders import lines first.** For an existing database with those tables already populated, leave them commented out.
-5. Run the remaining `.sql` scripts in DBeaver and record the outputs.
+```text
+.
+├── README.md
+├── results/
+│   ├── annual_order_counts.csv
+│   ├── customer_behaviour_by_state.csv
+│   ├── customer_repeat_purchase_metrics.csv
+│   ├── delivery_performance.csv
+│   ├── delivery_review_impact.csv
+│   ├── geographic_order_distribution.csv
+│   ├── monthly_delivery_reliability.csv
+│   ├── monthly_order_counts.csv
+│   ├── monthly_repeat_orders.csv
+│   ├── monthly_revenue.csv
+│   ├── overall_revenue.csv
+│   ├── payment_methods.csv
+│   ├── product_categories_by_revenue.csv
+│   ├── revenue_by_state.csv
+│   ├── review_score_distribution.csv
+│   ├── top_products_by_units.csv
+│   └── top_sellers_by_revenue.csv
+└── sql/
+    ├── 01_create_tables.sql
+    ├── 02_import_data.psql
+    ├── customer_analysis.sql
+    ├── data_validation.sql
+    ├── delivery_reviews_analysis.sql
+    ├── geographic_analysis.sql
+    ├── monthly_analysis.sql
+    ├── product_seller_analysis.sql
+    ├── revenue_analysis.sql
+    └── ...
+```
 
-## Methodology and limitations
-- Merchandise revenue is `SUM(order_items.price)` for orders whose status is not `canceled` or `unavailable`; freight is reported separately. This is **not profit** and does not reconcile automatically to payment totals.
-- Customer repeat purchasing uses `customer_unique_id`, not order-specific `customer_id`.
-- One-to-many order items and payments are aggregated before order-level analysis to prevent double counting.
-- Partial months near the beginning/end of dataset coverage should not be used to infer sustained business trends.
-- Observational comparisons (e.g., review score vs delivery timing) do not prove causation.
-- Raw CSVs are excluded from version control; obtain them from the linked source.
+## SQL scripts
+
+- `sql/01_create_tables.sql` — creates the PostgreSQL schema for the Olist data model.
+- `sql/02_import_data.psql` — imports the source CSV files into the database using `psql` and `\copy`.
+- `sql/data_validation.sql` — checks row counts, missing values, and basic integrity assumptions.
+- `sql/geographic_analysis.sql` — analyzes orders and revenue by state and region.
+- `sql/monthly_analysis.sql` — evaluates monthly order volume and seasonal trends.
+- `sql/revenue_analysis.sql` — calculates merchandise revenue, AOV, payment mix, and state-level revenue.
+- `sql/customer_analysis.sql` — investigates repeat purchases and customer behavior.
+- `sql/product_seller_analysis.sql` — highlights top-selling products and highest-performing sellers.
+- `sql/delivery_reviews_analysis.sql` — connects delivery performance to review scores and satisfaction.
+
+## Prerequisites
+
+Before running this project, make sure you have:
+
+- PostgreSQL installed and running
+- `psql` available on your machine
+- a local database created for the project
+- the Olist CSV files downloaded into a local `data/` directory
+
+## Setup
+
+1. Create a PostgreSQL database, for example:
+
+```bash
+createdb olist_ecommerce
+```
+
+2. Download the Olist dataset files and place them into a `data/` folder at the repository root.
+
+3. Run the schema creation script:
+
+```bash
+psql -h localhost -U postgres -d olist_ecommerce -f sql/01_create_tables.sql
+```
+
+4. Import the CSV data:
+
+```bash
+psql -h localhost -U postgres -d olist_ecommerce -v ON_ERROR_STOP=1 -f sql/02_import_data.psql
+```
+
+5. Run the analysis scripts in the `sql/` folder as needed.
+
+## Example analysis questions
+
+This project is structured around questions such as:
+
+- Which Brazilian states produce the most orders?
+- What are the monthly trends in orders and revenue?
+- How much revenue is generated by product category?
+- Which sellers and products lead in total sales?
+- Are repeat customers increasing over time?
+- Does longer delivery time correlate with lower review scores?
+
+## Output files
+
+The `results/` directory contains summarized CSV outputs generated from the SQL analysis, including:
+
+- annual and monthly order counts
+- revenue by month and state
+- repeat purchase metrics
+- payment method breakdown
+- delivery reliability and review score summaries
+- top sellers and top products by units sold or revenue
+
+## Important notes
+
+- The project focuses on merchandise revenue from `order_items.price`; freight is tracked separately and should not be treated as profit.
+- Customer behavior analysis is based on `customer_unique_id` to understand repeat purchasers more reliably.
+- Raw Olist CSV files are intentionally excluded from version control.
+- Some analyses are observational and should be interpreted carefully rather than as causal conclusions.
+
+## Potential next steps
+
+Future improvements could include:
+
+- adding an ER diagram to document table relationships
+- creating a more automated workflow with a single orchestration script
+- exporting charts and dashboards from the CSV outputs
+- adding a notebook or BI layer for easier exploration
+
+## License
+
+This project is intended for educational and analytical use. Please respect the license terms of the Olist dataset source when using the data.
+
+## Contributing
+
+Contributions are welcome. If you improve the SQL logic, add a new analysis, or refine the documentation, feel free to open a pull request.
